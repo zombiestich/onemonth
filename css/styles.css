@@ -1,0 +1,299 @@
+:root{
+    --bg:#D9D9D9;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    background:var(--bg);
+    overflow-x:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  body{
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+
+  #app{
+    position:relative;
+    z-index:1;
+    width:100%;
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+
+  /* ---------- decorative grey-green background stars ---------- */
+  .bg-stars{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .bg-star{
+    position:absolute;
+    clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+    animation-name:starTwinkle;
+    animation-timing-function:ease-in-out;
+    animation-iteration-count:infinite;
+  }
+  @keyframes starTwinkle{
+    0%,100%{ opacity:var(--op-min,0.12); transform:scale(0.85) rotate(var(--rot,0deg)); }
+    50%{ opacity:var(--op-max,0.4); transform:scale(1.08) rotate(calc(var(--rot,0deg) + 6deg)); }
+  }
+
+  .scene{
+    position:absolute;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:100%;
+    top:0;
+    left:0;
+    pointer-events:none;
+    opacity:0;
+  }
+  .scene.active{
+    position:relative;
+    pointer-events:auto;
+    opacity:1;
+  }
+
+  /* ---------- stage (image + overlay wrapper) ---------- */
+  .stage{
+    position:relative;
+    display:inline-block;
+    line-height:0;
+    touch-action:pan-y;
+    will-change:transform,opacity,filter;
+  }
+  .stage img{
+    display:block;
+    width:auto;
+    height:auto;
+    max-width:min(92vw,520px);
+    max-height:92vh;
+    max-height:92dvh;
+    -webkit-user-drag:none;
+    user-select:none;
+    pointer-events:none;
+    border-radius:2px;
+  }
+
+  /* crumble animations */
+  @keyframes crumbleOut{
+    0%{ transform:scale(1) rotate(0deg) translateY(0); filter:blur(0px) drop-shadow(0 0 0 rgba(0,0,0,0)); opacity:1; }
+    35%{ transform:scale(0.96) rotate(-2deg) translateY(6px); filter:blur(0.5px) drop-shadow(0 10px 18px rgba(0,0,0,0.18)); opacity:1; }
+    100%{ transform:scale(0.55) rotate(-14deg) translateY(70px); filter:blur(3px) drop-shadow(0 4px 10px rgba(0,0,0,0)); opacity:0; }
+  }
+  @keyframes crumbleIn{
+    0%{ transform:scale(0.55) rotate(10deg) translateY(60px); filter:blur(3px) drop-shadow(0 4px 10px rgba(0,0,0,0)); opacity:0; }
+    60%{ transform:scale(1.03) rotate(-1deg) translateY(-4px); filter:blur(0.5px) drop-shadow(0 12px 20px rgba(0,0,0,0.16)); opacity:1; }
+    100%{ transform:scale(1) rotate(0deg) translateY(0); filter:blur(0px) drop-shadow(0 6px 14px rgba(0,0,0,0.08)); opacity:1; }
+  }
+  .crumble-out{ animation:crumbleOut .62s cubic-bezier(.55,.05,.65,.95) forwards; }
+  .crumble-in{ animation:crumbleIn .7s cubic-bezier(.2,.75,.3,1) forwards; }
+
+  /* quick anticipatory wobble right before the calendar crumbles away */
+  @keyframes tapShake{
+    0%{ transform:scale(1) rotate(0deg); }
+    25%{ transform:scale(1.015) rotate(-1.1deg); }
+    50%{ transform:scale(0.995) rotate(1deg); }
+    75%{ transform:scale(1.01) rotate(-0.6deg); }
+    100%{ transform:scale(1) rotate(0deg); }
+  }
+  .tap-shake{ animation:tapShake .22s ease-in-out; }
+
+  /* certificate "pops out of" the 3 */
+  @keyframes popIn{
+    0%{ transform:scale(0.04) rotate(-10deg); opacity:0; filter:drop-shadow(0 0 0 rgba(0,0,0,0)); }
+    50%{ transform:scale(1.1) rotate(3deg); opacity:1; filter:drop-shadow(0 14px 22px rgba(0,0,0,0.18)); }
+    72%{ transform:scale(0.95) rotate(-1.5deg); opacity:1; }
+    88%{ transform:scale(1.02) rotate(0.5deg); }
+    100%{ transform:scale(1) rotate(0deg); opacity:1; filter:drop-shadow(0 6px 14px rgba(0,0,0,0.08)); }
+  }
+  .pop-in{
+    animation:popIn .75s cubic-bezier(.25,1.15,.4,1) forwards;
+    transform-origin:12.13% 58.44%; /* same on-screen point as the "3" hotspot */
+  }
+
+  /* ---------- calendar hotspot ---------- */
+  .hotspot{
+    position:absolute;
+    left:0.83%;
+    top:50.94%;
+    width:22.6%;
+    height:15%;
+    clip-path:ellipse(50% 50% at 50% 50%);
+    background:transparent;
+    border:none;
+    padding:0;
+    margin:0;
+    cursor:pointer;
+    z-index:5;
+  }
+  .hotspot:focus{ outline:none; }
+
+  .glow{
+    position:absolute;
+    left:0.83%;
+    top:50.94%;
+    width:22.6%;
+    height:15%;
+    border-radius:50%;
+    pointer-events:none;
+    background:radial-gradient(ellipse at center, rgba(255,214,143,0.85) 0%, rgba(255,180,120,0.45) 45%, rgba(255,180,120,0) 75%);
+    opacity:0;
+    transform:scale(0.85);
+    z-index:4;
+  }
+  @keyframes glowPulse{
+    0%{ opacity:0; transform:scale(0.8); }
+    25%{ opacity:1; transform:scale(1.12); }
+    55%{ opacity:0.55; transform:scale(0.95); }
+    100%{ opacity:0; transform:scale(1.25); }
+  }
+  .glow.pulsing{ animation:glowPulse 1.1s ease-out; }
+  .glow.tapped{ animation:glowPulse .5s ease-out; }
+
+  /* very faint ambient breathing glow at rest, hints there's something to find */
+  @keyframes idleBreathe{
+    0%,100%{ opacity:0; transform:scale(0.9); }
+    50%{ opacity:0.22; transform:scale(1.04); }
+  }
+  .glow.idle{ animation:idleBreathe 3.4s ease-in-out infinite; }
+
+  /* ---------- "press" hint label ---------- */
+  .press-label{
+    position:absolute;
+    left:26%;
+    top:52.5%;
+    width:30%;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    pointer-events:none;
+    z-index:5;
+    color:#7a3b3b;
+    font-family:'Segoe Script','Bradley Hand','Comic Sans MS',cursive;
+    font-size:clamp(13px,3.6vw,17px);
+    line-height:1.1;
+    transform:rotate(-4deg);
+    opacity:0.92;
+    transition:opacity .4s ease;
+    animation:pressBounce 1.8s ease-in-out infinite;
+  }
+  .press-label .arrow{
+    font-size:1.3em;
+    transform:scaleX(-1) rotate(8deg);
+    display:inline-block;
+  }
+  .press-label.fading{ opacity:0; }
+  @keyframes pressBounce{
+    0%,100%{ transform:rotate(-4deg) translateX(0); }
+    50%{ transform:rotate(-4deg) translateX(-5px); }
+  }
+
+  /* ---------- floating particles (notes / stars / sparkles) ---------- */
+  .particle-layer{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    overflow:visible;
+    z-index:20;
+  }
+  .particle{
+    position:absolute;
+    will-change:transform,opacity;
+    font-size:22px;
+    opacity:0;
+    animation-name:floatUp;
+    animation-timing-function:cubic-bezier(.2,.6,.35,1);
+    animation-fill-mode:forwards;
+  }
+  @keyframes floatUp{
+    0%{ transform:translate(0,0) scale(0.4) rotate(0deg); opacity:0; }
+    12%{ opacity:1; }
+    100%{ transform:translate(var(--dx),var(--dy)) scale(1) rotate(var(--rot)); opacity:0; }
+  }
+
+  /* ---------- certificate stage / scratch canvas ---------- */
+  #scratchCanvas{
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    z-index:6;
+    touch-action:none;
+    cursor:pointer;
+  }
+
+  /* ---------- confetti ---------- */
+  .confetti-layer{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    overflow:visible;
+    z-index:25;
+  }
+  .confetti{
+    position:absolute;
+    top:0;
+    left:0;
+    opacity:0;
+    will-change:transform,opacity;
+    animation-name:confettiFall;
+    animation-timing-function:cubic-bezier(.25,.46,.45,.94);
+    animation-fill-mode:forwards;
+  }
+  @keyframes confettiFall{
+    0%{ transform:translate(0,0) rotate(0deg) scale(0.5); opacity:0; }
+    10%{ opacity:1; }
+    100%{ transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(1); opacity:0; }
+  }
+
+  /* ---------- replay button ---------- */
+  #replayBtn{
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%);
+    z-index:50;
+    border:none;
+    padding:10px 22px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.88);
+    color:#5c6b4a;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:0.02em;
+    box-shadow:0 4px 14px rgba(0,0,0,0.15);
+    cursor:pointer;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .4s ease, transform .2s ease;
+  }
+  #replayBtn.visible{ opacity:1; pointer-events:auto; }
+  #replayBtn:active{ transform:translateX(-50%) scale(0.95); }
+
+  .sr-only{
+    position:absolute;
+    width:1px;height:1px;
+    padding:0;margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
