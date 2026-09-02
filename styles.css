@@ -3,7 +3,7 @@
   --ink: #f3f6fb;
   --muted: #a9b7c9;
   --blue: #93d6ff;
-  --night: #0b1422;
+  --night: #D9D9D9;
 }
 
 * {
@@ -22,18 +22,7 @@ body {
   min-height: 100svh;
   overflow: hidden;
   color: var(--ink);
-  background:
-    radial-gradient(
-      circle at 50% 40%,
-      rgba(63, 106, 141, 0.22),
-      transparent 34rem
-    ),
-    radial-gradient(
-      circle at 12% 92%,
-      rgba(104, 160, 198, 0.1),
-      transparent 28rem
-    ),
-    var(--night);
+  background: var(--night);
   font-family:
     ui-sans-serif,
     system-ui,
